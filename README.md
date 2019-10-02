@@ -19,9 +19,9 @@ The results will be a csv with the following columns
 
 ```install_prob: probability the user decides to install```
 
-Confusion matrix of random forest models
+Confusion matrix of random forest model:
 
-![Fig.1 Confusion Matrix](assets/cm.PNG)
+![](assets/cm.png)
 
 Model parameters:
 
@@ -38,9 +38,9 @@ RandomForestClassifier(bootstrap=True, class_weight=None, criterion='gini',
 #### Chart of LSTM results
 
 ### LSTM
-![](assets/lstm.PNG)
+![](assets/lstm.png)
 ### Zoomed in LSTM
-![](zlstm.PNG)
+![](zlstm.png)
 
 Observations 1 to 9990  is the model learning the latent space of observations that do not choose to install after being shown an ads. (Training)
 Observations 9990 to 11350 are mix of observations that do and do not install after being shown adds (Testing).
