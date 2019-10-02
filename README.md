@@ -46,9 +46,9 @@ RandomForestClassifier(bootstrap=True, class_weight=None, criterion='gini',
 ### Zoomed in LSTM
 ![](assets/zlstm.png)
 
-Observations 1 to 9990  is the model learning the latent space of observations that do not choose to install after being shown an ads. (Training)
-Observations 9990 to 11350 are mix of observations that do and do not install after being shown adds (Testing).
-The spikes in the chart from observations X to N are are the model predicts for visitors who will choose to install after being shown an add.
+Observations 1 to 9990  is the model learning the latent space of observations that do not choose to install after being shown an ad (training).
+Observations 9990 to 11350 are mix of observations that do and do not install after being shown an ad (testing).
+The spikes in the chart from observations 9990 to 11350 are are the model predictions for visitors who will choose to install after being shown an ad.
 
 
 #### Ted Thompson
