@@ -15,11 +15,15 @@ To run model give your columns the same names as the ones used in the analysis a
 
 The results will be a csv with the following columns
 
-```id: site visitor id```
+```
+id: site visitor id
 
-```install_prob: probability the user decides to install```
+install_prob: probability the user decides to install
+```
 
-Confusion matrix of random forest model:
+
+
+#### Confusion matrix of random forest model:
 
 ![](assets/cm.png)
 
@@ -35,12 +39,12 @@ RandomForestClassifier(bootstrap=True, class_weight=None, criterion='gini',
                        verbose=0, warm_start=True)
 ```
 
-#### Chart of LSTM results
+#### Charts of LSTM results
 
 ### LSTM
 ![](assets/lstm.png)
 ### Zoomed in LSTM
-![](zlstm.png)
+![](assets/zlstm.png)
 
 Observations 1 to 9990  is the model learning the latent space of observations that do not choose to install after being shown an ads. (Training)
 Observations 9990 to 11350 are mix of observations that do and do not install after being shown adds (Testing).
