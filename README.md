@@ -25,7 +25,13 @@ Confusion matrix of random forest models
 
 Model parameters:
 
-``````
+```RandomForestClassifier(bootstrap=True, class_weight=None, criterion='gini',
+                       max_depth=4, max_features=7, max_leaf_nodes=None,
+                       min_impurity_decrease=0.0, min_impurity_split=None,
+                       min_samples_leaf=1, min_samples_split=10,
+                       min_weight_fraction_leaf=0.0, n_estimators=10,
+                       n_jobs=None, oob_score=False, random_state=None,
+                       verbose=0, warm_start=True)```
 
 Chart of LSTM results
 
