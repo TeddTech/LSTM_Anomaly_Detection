@@ -68,105 +68,120 @@ test_data = sys.argv[1]
 
 logger.info("Loading test_data.csv....")
 print("Loading test_data.csv....")
-dat_test = pd.read_csv(test_data, sep=';', engine='c', iterator=True, chunksize=1870068)
 
-#processing half of the test data at a time due to resources restrictions
-f = [1,2]
-for j,dat in zip(tqdm(f),dat_test):
-	### set column types
-	coltype = {'id': 'category', 'softwareVersion': 'category', 'deviceType': 'str','campaignId':'category', 'platform':'category',
-	       'sourceGameId':np.int64, 'country':'category', 'startCount':np.int64, 'viewCount':np.int64, 'clickCount':np.int64,
-	       'installCount':np.int64,  'startCount1d':np.int64, 'startCount7d':np.int64,
-	       'connectionType':'category'}
+#skiped line 2190031: pandas.errors.ParserError: Error tokenizing data. C error: EOF inside string starting at line 2190031
+dat = pd.read_csv(test_data, sep=';', engine='c', skiprows=[2190031])
 
-	logger.info("setting column type...")
-	print("setting column type...")
+# f = [2]
+# for k, dat in zip(tqdm(f),dat_test):
+### set column types
+coltype = {'id': 'category', 'softwareVersion': 'category', 'deviceType': 'str','campaignId':'category', 'platform':'category',
+       'sourceGameId':np.int64, 'country':'category', 'startCount':np.int64, 'viewCount':np.int64, 'clickCount':np.int64,
+       'installCount':np.int64,  'startCount1d':np.int64, 'startCount7d':np.int64,
+       'connectionType':'category'}
 
-	for i in coltype:
-	    dat[i]=dat[i].astype(coltype[i])
+logger.info("setting column type...")
+print("setting column type...")
 
-	logger.info("setting time columns...")
-	print("setting time columns...")
+for i in coltype:
+    dat[i]=dat[i].astype(coltype[i])
 
-	#set time column type
-	dat['timestamp'] = pd.to_datetime(dat['timestamp'])
-	dat['lastStart'] = pd.to_datetime(dat['lastStart'])
-	# dates need to be converted for model
-	dat['date'] = dat['timestamp'].astype(np.int64)
+logger.info("setting time columns...")
+print("setting time columns...")
 
-	dat['lastStartHours'] = (dat['timestamp']-dat['lastStart'])/np.timedelta64(1,'h')
-	dat['lastStartHours'].fillna(0,inplace=True)
-	dat['month'] = dat['timestamp'].dt.month
-	dat['day'] = dat['timestamp'].dt.dayofweek
-	dat['hour'] = dat['timestamp'].dt.hour
+#set time column type
+dat['timestamp'] = pd.to_datetime(dat['timestamp'])
+dat['lastStart'] = pd.to_datetime(dat['lastStart'])
+# dates need to be converted for model
+dat['date'] = dat['timestamp'].astype(np.int64)
 
-	#dropping columns I'm not going to need
-	#all observations take place in january
-	X = dat.drop(columns=['lastStart', 'month'])
+dat['lastStartHours'] = (dat['timestamp']-dat['lastStart'])/np.timedelta64(1,'h')
+dat['lastStartHours'].fillna(0,inplace=True)
+dat['month'] = dat['timestamp'].dt.month
+dat['day'] = dat['timestamp'].dt.dayofweek
+dat['hour'] = dat['timestamp'].dt.hour
 
-	logger.info("setting dummies...")
-	print("setting time dummies...")
+#dropping columns I'm not going to need
+#all observations take place in january
+X = dat.drop(columns=['lastStart', 'month'])
 
-	#one hot encoding on category type
-	X = pd.get_dummies(X, columns=['connectionType', 'platform']) #campainId excluded because not enough resources for cardinality
+logger.info("setting dummies...")
+print("setting time dummies...")
 
-	X['country_n'] = X.country.astype('object')
-	X['country_n'] = X['country_n'].fillna('0')
+#one hot encoding on category type
+X = pd.get_dummies(X, columns=['connectionType', 'platform']) #campainId excluded because not enough resources for cardinality
 
-	PCA_cols = list()
-	L_cols = list()
-	for i in X.columns:
-	    if (X[i].unique().shape[0]>100) and (X[i].dtype not in [np.int64,np.int8,np.datetime64,np.float64]):
-	        L_cols.append(i)
-	    if (X[i].unique().shape[0]>100) and (X[i].dtype not in [np.int64,np.int8,np.datetime64,np.float64]) and i not in ['id','campaignId','timestamp', 'sourceGameId', 'deviceType']:
-	        PCA_cols.append(i)
+X['country_n'] = X.country.astype('object')
+X['country_n'] = X['country_n'].fillna('0')
 
-	# my device doesn't have the resources to compute to complete one hot encoding and pca with softwareVersion and deviceType so they will also be excuded
+PCA_cols = list()
+L_cols = list()
+for i in X.columns:
+    if (X[i].unique().shape[0]>100) and (X[i].dtype not in [np.int64,np.int8,np.datetime64,np.float64]):
+        L_cols.append(i)
+    if (X[i].unique().shape[0]>100) and (X[i].dtype not in [np.int64,np.int8,np.datetime64,np.float64]) and i not in ['id','campaignId','timestamp', 'sourceGameId', 'deviceType']:
+        PCA_cols.append(i)
+
+# my device doesn't have the resources to compute to complete one hot encoding and pca with softwareVersion and deviceType so they will also be excuded
 
 
-	#cardinaliry to high for my computer for the following columns
+#cardinaliry to high for my computer for the following columns
 
-	logger.info("setting PCA + dummies...")
-	print("setting PCA + dummies...")
+logger.info("setting PCA + dummies...")
+print("setting PCA + dummies...")
 
-	# list of # of pca for each column
-	n_pc=[5,12]
+# list of # of pca for each column
+n_pc=[5,12]
 
-	for i,j in zip(tqdm(PCA_cols),n_pc):
-	    x = pd.get_dummies(X[i])
-	    pca = PCA(n_components=j)
-	    Z = pca.fit_transform(x)
-	    print(i+':', pca.components_.shape)
-	    Z_dat = pd.DataFrame(Z, columns=[i+'_'+str(n) for n in np.arange(1,pca.components_.shape[0]+1)])
-	    X[Z_dat.columns] = Z_dat
+for i,j in zip(tqdm(PCA_cols),n_pc):
+    x = pd.get_dummies(X[i])
+    pca = PCA(n_components=j)
+    Z = pca.fit_transform(x)
+    print(i+':', pca.components_.shape)
+    Z_dat = pd.DataFrame(Z, columns=[i+'_'+str(n) for n in np.arange(1,pca.components_.shape[0]+1)])
+    X[Z_dat.columns] = Z_dat
 
-	logger.info("setting LabelEncoder")
-	print("setting LabelEncoder")
+logger.info("setting LabelEncoder")
+print("setting LabelEncoder")
 
-	L = ['campaignId','softwareVersion', 'deviceType', 'country_n']
-	for i in tqdm(L):
-	    encoder = LabelEncoder()
-	    X[i] = encoder.fit_transform(X[i])
+L = ['campaignId','softwareVersion', 'deviceType', 'country_n']
+for i in tqdm(L):
+    encoder = LabelEncoder()
+    X[i] = encoder.fit_transform(X[i])
 
-	df = X.drop(columns=['country'])
-	idx = df[df.isnull().any(axis=1)].index.values
-	X.drop(index=idx, inplace=True)
+# if X.empty:
+# 	print('***********','DataFrame is empty!'.upper(), '***********')
+# print(X.head())
 
-	# set id as index
-	X.set_index('id', inplace=True)
+df = X.drop(columns=['country'])
+idx = df[df.isnull().any(axis=1)].index.values
+X.drop(index=idx, inplace=True)
 
-	X.drop(columns=['country','softwareVersion', 'timestamp'], inplace=True)
-	x = pd.DataFrame(index=X.index)
+# if X.empty:
+# 	print('***********','DataFrame is empty!'.upper(), '***********')
+# print(X.head())
 
-	logger.info("setting predictions")
-	print("setting predictions")
+# set id as index
+X.set_index('id', inplace=True)
 
-	#load model
-	model = joblib.load('rf_model.pkl')
+X.drop(columns=['country','softwareVersion', 'timestamp'], inplace=True)
+x = pd.DataFrame(index=X.index)
 
-	x['install_prob'] = model.predict_proba(X)[:,1]
+# if X.empty:
+# 	print('***********','DataFrame is empty!'.upper(), '***********')
 
-	logger.info("saving as test_data_predicted_{j}.csv".format(j))
-	print("saving as test_data_predicted_{j}.csv".format(j))
+logger.info("setting predictions")
+print("setting predictions")
 
-	x.to_csv('results/test_data_predicted_{j}.csv'.format(j))
+#load model
+model = joblib.load('rf_model.pkl')
+
+x['install_prob'] = model.predict_proba(X)[:,1]
+
+logger.info("saving as test_data_predicted.csv")
+print("saving as test_data_predicted.csv")
+
+x.to_csv('results/test_data_predicted.csv')
+
+logger.info("script FIN")
+print("script FIN")
