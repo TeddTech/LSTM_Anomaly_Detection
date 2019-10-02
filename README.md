@@ -21,22 +21,32 @@ The results will be a csv with the following columns
 
 Confusion matrix of random forest models
 
-![]()
+![Fig.1 Confusion Matrix](assets/cm.PNG)
 
 Model parameters:
 
-```RandomForestClassifier(bootstrap=True, class_weight=None, criterion='gini',
+```
+RandomForestClassifier(bootstrap=True, class_weight=None, criterion='gini',
                        max_depth=4, max_features=7, max_leaf_nodes=None,
                        min_impurity_decrease=0.0, min_impurity_split=None,
                        min_samples_leaf=1, min_samples_split=10,
                        min_weight_fraction_leaf=0.0, n_estimators=10,
                        n_jobs=None, oob_score=False, random_state=None,
-                       verbose=0, warm_start=True)```
+                       verbose=0, warm_start=True)
+```
 
-Chart of LSTM results
+#### Chart of LSTM results
 
-Observations 1 to X  is the model learning the latent space of observations that do not choose to install after being shown an ads. (Training)
-Observations X to N are mix of observations that do and do not install after being shown adds (Testing).
+### LSTM
+![](assets/lstm.PNG)
+### Zoomed in LSTM
+![](zlstm.PNG)
+
+Observations 1 to 9990  is the model learning the latent space of observations that do not choose to install after being shown an ads. (Training)
+Observations 9990 to 11350 are mix of observations that do and do not install after being shown adds (Testing).
 The spikes in the chart from observations X to N are are the model predicts for visitors who will choose to install after being shown an add.
-![]()
-![]()
+
+
+#### Ted Thompson
+
+##### 2017
