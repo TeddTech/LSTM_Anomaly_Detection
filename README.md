@@ -1,6 +1,6 @@
 # LSTM_Anomaly_Detection
 
-This repo contains the analysis of a gaming firm's production logs.
+This repository contains the analysis of a gaming firm's production logs.
 Using this data I build models to predict if a user will install a product after being shown an advertisement.
 
 The analysis starts with traditional models used for predicting clicks. Then switch over to treating the problem as an anomaly detection using a LSTM.
